@@ -8,7 +8,9 @@ import bgImage from "../../../assets/bg.png";
 import { AuthContext } from "../../../providers/AuthProvider";
 
 const RightNav = () => {
-  const googleSignIn = useContext(AuthContext);
+  const { googleSignIn, githubSignIn, facebookSignIn } =
+    useContext(AuthContext);
+
   const handleGoogleSignIn = () => {
     googleSignIn()
       .then(result => {
@@ -21,29 +23,60 @@ const RightNav = () => {
         console.log(errorCode, errorMessage);
       });
   };
+
+  const handleGithubSignIn = () => {
+    githubSignIn()
+      .then(result => {
+        const credential = GithubAuthProvider.credentialFromResult(result);
+        const token = credential.accessToken;
+        const user = result.user;
+      })
+      .catch(error => {
+        const errorCode = error.code;
+        const errorMessage = error.message;
+        const email = error.customData.email;
+        const credential = GithubAuthProvider.credentialFromError(error);
+      });
+  };
+
+  const handleFacebookSignIn = () => {
+    facebookSignIn()
+      .then(result => {
+        const facebookUser = result.user;
+        console.log(facebookUser);
+        const credential = FacebookAuthProvider.credentialFromResult(result);
+        const accessToken = credential.accessToken;
+      })
+      .catch(error => {
+        const errorCode = error.code;
+        const errorMessage = error.message;
+        console.log(errorCode, errorMessage);
+        const email = error.customData.email;
+        const credential = FacebookAuthProvider.credentialFromError(error);
+      });
+  };
+
   return (
     <div>
       <div>
         <h4>Login With</h4>
-        <Button onSubmit={handleGoogleSignIn} variant="outline-success">
+        <Button onClick={handleGoogleSignIn} variant="outline-success">
           <FcGoogle size={32} /> Google
         </Button>
         <br />
-        <Button variant="outline-success my-2">
+        <Button onClick={handleGithubSignIn} variant="outline-success my-2">
           <RxGithubLogo size={32} /> GitHub
         </Button>
         <br />
-        <Button variant="outline-success w-full">
-          <BsFacebook size={32} /> Facebook
-        </Button>{" "}
-        <br />
-        <ListGroup>
-          <ListGroup.Item>
-            <Button variant="">
-              <BsFacebook size={32} /> Facebook
-            </Button>{" "}
-          </ListGroup.Item>
-        </ListGroup>
+        <button onClick={handleFacebookSignIn}>
+          <ListGroup>
+            <ListGroup.Item>
+              <Button variant="">
+                <BsFacebook size={32} /> Facebook
+              </Button>{" "}
+            </ListGroup.Item>
+          </ListGroup>
+        </button>
       </div>
       <ListGroup className="my-5">
         <ListGroup.Item>
